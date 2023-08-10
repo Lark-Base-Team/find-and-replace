@@ -1,0 +1,144 @@
+.fieldTitle {
+    font-family: "PingFang SC";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 22px;
+    color: #646a73;
+    padding-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+.fieldTitle .icon path {
+    fill: #646a73;
+    stroke-width: 1px;
+}
+.fieldTitle .icon {
+    margin-right: 5px;
+}
+
+.d {
+    --cel-max-width: 300px;
+    margin-bottom: 12px;
+}
+
+.header {
+    display: flex;
+    background: #f8f9fa;
+    height: 32px;
+    color: #646a73;
+    line-height: 32px;
+    border: 1px solid gainsboro;
+    border-bottom: none;
+    border-radius: 5px 5px 0 0;
+    font-weight: 500;
+}
+.header > .operation {
+    max-width: 100px;
+    width: 100px;
+    flex-grow: 0;
+    text-align: end;
+}
+.header div {
+    flex-grow: 1;
+    width: 0;
+    padding: 0 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.header div:nth-child(2) {
+    border-right: 1px solid rgba(31, 35, 41, 0.15);
+    border-left: 1px solid rgba(31, 35, 41, 0.15);
+}
+.diffList {
+    display: flex;
+    border: 1px solid gainsboro;
+    justify-content: space-between;
+}
+.diffList {
+    border-bottom: none;
+}
+.diffList:nth-last-child(1) {
+    border-radius: 0 0 5px 5px;
+    border: 1px solid gainsboro;
+}
+
+.fiffLsit > div {
+    flex-grow: 1;
+    flex-basis: 0;
+    width: 0;
+}
+
+.btn {
+    flex-shrink: 0;
+    flex-grow: 0;
+    display: flex;
+    width: 100px;
+    padding: 6px 12px;
+    align-items: center;
+    justify-content: flex-end;
+}
+.diffCell {
+    display: flex;
+    flex-grow: 1;
+    overflow: auto;
+}
+
+.old,
+.new {
+    width: 0;
+    flex-basis: 0;
+    flex-grow: 10;
+    overflow: scroll;
+    white-space: pre-line;
+    padding: 7px 12px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    max-height: 124px;
+}
+.diffCell div::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+
+.new {
+    padding-left: 12px;
+    border-right: 1px solid rgba(31, 35, 41, 0.15);
+    border-left: 1px solid rgba(31, 35, 41, 0.15);
+}
+
+a {
+    text-decoration: none;
+    color: #0067ff;
+}
+
+.bt3,
+.bt3.semi-button-primary.semi-button-light,
+.semi-button-primary.semi-button-borderless {
+    font-size: 12px;
+    border: 1px solid #d0d3d6;
+    height: 24px;
+    line-height: 24px;
+    padding: 0 12px;
+    color: #1f2329;
+}
+.bt3.semi-button-light:not(.semi-button-disabled):hover {
+    border: 1px solid #d0d3d6;
+    background-color: #f2f3f5;
+}
+.bt3.semi-button-light:not(.semi-button-disabled):active {
+    border: 1px solid #d0d3d6;
+    background-color: #eff0f1;
+}
+.bt3:hover {
+    border: 1px solid #d0d3d6;
+}
+.bt3.semi-button-disabled.semi-button-light,
+.semi-button-disabled.semi-button-borderless {
+    padding: 0 8px;
+    color: #bbbfc4;
+}
