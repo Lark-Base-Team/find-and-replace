@@ -5,11 +5,7 @@ import { initI18n } from './i18n'
 import { bitable } from '@base-open/web-api'
 import { useTranslation } from 'react-i18next';
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    <LoadApp />
-  </React.StrictMode>
-)
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(<LoadApp />)
 
 
 function LoadApp() {

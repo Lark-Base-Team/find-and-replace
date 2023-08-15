@@ -9,7 +9,7 @@ import {
 import { FormApi } from "@douyinfe/semi-ui/lib/es/form";
 import { IFieldMeta, FieldType, IWidgetField, IWidgetTable, TableMeta, bitable } from "@base-open/web-api";
 import { useEffect, useRef, useState, useMemo } from "react";
-import { FiledTypesDesc, replaceCells, ReplaceInfos, SupportField } from './utils'
+import { FiledTypesDesc, replaceCells, ReplaceInfos, SupportField, createRegexFromString } from './utils'
 import DiffCard from "./components/DiffCard";
 import { useTranslation } from 'react-i18next';
 import { icons } from './icons'
@@ -257,7 +257,7 @@ function App() {
 
       if (mode === ModeValue.reg) {
         try {
-          new RegExp(findCellReg)
+          createRegexFromString(findCellReg)
           findCellValue = findCellReg
         } catch (error) {
           Toast.error(t("reg.text"))
