@@ -1,14 +1,5 @@
 import { IWidgetField, bitable, IOpenCellValue, checkers, IOpenSegment, IOpenSingleCellValue, IOpenSegmentType, FieldType, IWidgetTable, IFieldMeta, IOpenNumber, IOpenPhone, IOpenUrlSegment } from "@base-open/web-api";
 import { Toast } from '@douyinfe/semi-ui'
-
-
-
-
-
-
-
-
-
 import { ModeValue } from "./App";
 
 
@@ -414,5 +405,21 @@ function replaceWithJson(str: string, zidian: Record<string, string>) {
 }
 
 function replaceWithReg(str: string, reg: string, replaceBy: string) {
-  return str.replace(new RegExp(reg), replaceBy)
+  const regExp = createRegexFromString(reg)
+  return str.replace(regExp, replaceBy)
+}
+
+export function createRegexFromString(str: string) {
+  const regexParts = str.trim().match(/\/(.*)\/([gimyus]{0,6})/);
+
+  if (regexParts && regexParts.length >= 3) {
+    const pattern = regexParts[1];
+    const flags = regexParts[2];
+
+    const regex = new RegExp(pattern, flags);
+
+    return regex;
+  } else {
+    throw new Error('Invalid regular expression string');
+  }
 }
