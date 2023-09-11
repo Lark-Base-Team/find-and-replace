@@ -1,7 +1,7 @@
 import "./App.css";
 import {
   FieldType,
-} from "@base-open/web-api";
+} from "@lark-base-open/js-sdk";
 import { SupportField } from "./utils";
 
 

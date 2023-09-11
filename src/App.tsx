@@ -7,7 +7,7 @@ import {
   Spin
 } from "@douyinfe/semi-ui";
 import { FormApi } from "@douyinfe/semi-ui/lib/es/form";
-import { IFieldMeta, FieldType, IWidgetField, IWidgetTable, TableMeta, bitable } from "@base-open/web-api";
+import { IFieldMeta, FieldType, IWidgetField, IWidgetTable, TableMeta, bitable } from "@lark-base-open/js-sdk";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { FiledTypesDesc, replaceCells, ReplaceInfos, SupportField, createRegexFromString } from './utils'
 import DiffCard from "./components/DiffCard";
@@ -374,11 +374,11 @@ function App() {
         .map((v) => v.value.fieldIdRecordId);
       setSeccessed(successArr);
       if (failedArr.length) {
-        Toast.success(t("success", { success: successArr.length, err: failedArr.length }));
+        Toast.success({ content: t("success", { success: successArr.length, err: failedArr.length }), duration: 5 });
         return;
       }
       setlatestSuccessResultKey(resultKey);
-      Toast.success(t("success2", { success: successArr.length }));
+      Toast.success({ content: t("success2", { success: successArr.length }), duration: 5 });
     }
   };
   const onClickFindBtn = async () => {
