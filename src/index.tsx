@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import { initI18n } from './i18n'
-import { bitable } from '@base-open/web-api'
+import { bitable } from '@lark-base-open/js-sdk'
 import { useTranslation } from 'react-i18next';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(<LoadApp />)

@@ -1,4 +1,4 @@
-import { IWidgetField, bitable, IOpenCellValue, checkers, IOpenSegment, IOpenSingleCellValue, IOpenSegmentType, FieldType, IWidgetTable, IFieldMeta, IOpenNumber, IOpenPhone, IOpenUrlSegment } from "@base-open/web-api";
+import { IWidgetField, bitable, IOpenCellValue, checkers, IOpenSegment, IOpenSingleCellValue, IOpenSegmentType, FieldType, IWidgetTable, IFieldMeta, IOpenNumber, IOpenPhone, IOpenUrlSegment } from "@lark-base-open/js-sdk";
 import { Toast } from '@douyinfe/semi-ui'
 import { ModeValue } from "./App";
 
@@ -255,37 +255,68 @@ export async function replaceCells({
     }
   });
   const replaceAll = async () => {
-    const task = toSetList.map(({ value, recordId }) => {
-      return () => table
-        .setCellValue(fieldId, recordId, value)
-        .then(() => {
-          return {
-            success: true,
-            fieldIdRecordId: fieldId + ";" + recordId,
-          };
-        })
-        .catch((e) => {
-          Toast.error(`error: ${e}`);
-          return Promise.reject({
-            success: false,
-            fieldIdRecordId: fieldId + ";" + recordId,
-          });
-        });
-    })
-    const res: any[] = []
-    // 一次并发10个，
-    const step = 10
-    for (let index = 0; index < task.length; index += step) {
-      const elements = task.slice(index, index + step);
-      const r = await Promise.allSettled(elements.map(t => t()))
-      res.push(...r)
+    const step = 500;
+    const success: any = [];
+    const failed: any = []
+    for (let index = 0; index < toSetList.length; index += step) {
+      const element = toSetList.slice(index, index + step);
+      await table.setRecords(element.map(({ value, recordId }) => {
+        return {
+          recordId,
+          fields: {
+            [fieldId]: value,
+          }
+        }
+      })).then(() => {
+        success.push(...element.map(({ recordId }) => ({ status: 'fulfilled', value: { success: true, fieldIdRecordId: fieldId + ";" + recordId } })))
+      }).catch((e) => {
+        failed.push(...element.map(({ recordId }) => ({ status: 'fulfilled', value: { success: false, fieldIdRecordId: fieldId + ";" + recordId } })))
+      })
+
+      await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve('')
+        }, 500);
+      })
     }
-    let success = res.filter((v) => v.status === "fulfilled");
-    let failed = res.filter((v) => v.status === "rejected");
-    return {
-      success,
-      failed,
-    };
+    return { success, failed };
+
+
+
+
+
+    // const task = toSetList.map(({ value, recordId }) => {
+    //   return () => table
+    //     .setCellValue(fieldId, recordId, value)
+    //     .then(() => {
+    //       return {
+    //         success: true,
+    //         fieldIdRecordId: fieldId + ";" + recordId,
+    //       };
+    //     })
+    //     .catch((e) => {
+    //       Toast.error(`error: ${e}`);
+    //       return Promise.reject({
+    //         success: false,
+    //         fieldIdRecordId: fieldId + ";" + recordId,
+    //       });
+    //     });
+    // })
+    // const res: any[] = []
+    // 一次并发n个，
+    // console.log(task);
+    // for (let index = 0; index < task.length; index += step) {
+    //   const elements = task.slice(index, index + step);
+    //   const r = await Promise.allSettled(elements.map(t => t()))
+    //   res.push(...r)
+    // }
+    // let success = res.filter((v) => v.status === "fulfilled");
+    // let failed = res.filter((v) => v.status === "rejected");
+    // console.log({ success, failed })
+    // return {
+    //   success,
+    //   failed,
+    // };
   };
 
   return {
