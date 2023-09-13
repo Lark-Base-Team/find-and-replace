@@ -255,11 +255,12 @@ export async function replaceCells({
     }
   });
   const replaceAll = async () => {
-    const step = 500;
+    const step = 5000;
     const success: any = [];
     const failed: any = []
     for (let index = 0; index < toSetList.length; index += step) {
       const element = toSetList.slice(index, index + step);
+      let sleep = element.length
       await table.setRecords(element.map(({ value, recordId }) => {
         return {
           recordId,
@@ -276,7 +277,7 @@ export async function replaceCells({
       await new Promise((resolve) => {
         setTimeout(() => {
           resolve('')
-        }, 500);
+        }, sleep);
       })
     }
     return { success, failed };
@@ -284,39 +285,6 @@ export async function replaceCells({
 
 
 
-
-    // const task = toSetList.map(({ value, recordId }) => {
-    //   return () => table
-    //     .setCellValue(fieldId, recordId, value)
-    //     .then(() => {
-    //       return {
-    //         success: true,
-    //         fieldIdRecordId: fieldId + ";" + recordId,
-    //       };
-    //     })
-    //     .catch((e) => {
-    //       Toast.error(`error: ${e}`);
-    //       return Promise.reject({
-    //         success: false,
-    //         fieldIdRecordId: fieldId + ";" + recordId,
-    //       });
-    //     });
-    // })
-    // const res: any[] = []
-    // 一次并发n个，
-    // console.log(task);
-    // for (let index = 0; index < task.length; index += step) {
-    //   const elements = task.slice(index, index + step);
-    //   const r = await Promise.allSettled(elements.map(t => t()))
-    //   res.push(...r)
-    // }
-    // let success = res.filter((v) => v.status === "fulfilled");
-    // let failed = res.filter((v) => v.status === "rejected");
-    // console.log({ success, failed })
-    // return {
-    //   success,
-    //   failed,
-    // };
   };
 
   return {

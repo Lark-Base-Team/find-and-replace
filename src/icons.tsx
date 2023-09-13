@@ -5,8 +5,6 @@ import {
 import { SupportField } from "./utils";
 
 
-// 从 https://universe.bytedance.net/resource/icons 下载的图标
-
 export const icons: Record<SupportField, any> = {
   [FieldType.Text]: (
     <svg

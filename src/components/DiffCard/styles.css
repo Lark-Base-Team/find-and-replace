@@ -104,7 +104,6 @@
     height: 0;
 }
 
-
 .new {
     padding-left: 12px;
     border-right: 1px solid rgba(31, 35, 41, 0.15);
@@ -141,4 +140,17 @@ a {
 .semi-button-disabled.semi-button-borderless {
     padding: 0 8px;
     color: #bbbfc4;
+}
+
+.loadMore {
+    display: flex;
+    height: 50px;
+    justify-content: center;
+    padding: 10px;
+    cursor:pointer;
+}
+
+.loadMore svg {
+    height: 40px;
+    width: auto;
 }
