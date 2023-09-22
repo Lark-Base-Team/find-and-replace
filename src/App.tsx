@@ -4,7 +4,8 @@ import {
   Toast,
   Form,
   Checkbox,
-  Spin
+  Spin,
+  Tooltip
 } from "@douyinfe/semi-ui";
 import { FormApi } from "@douyinfe/semi-ui/lib/es/form";
 import { IFieldMeta, FieldType, IWidgetField, IWidgetTable, TableMeta, bitable } from "@lark-base-open/js-sdk";
@@ -13,16 +14,8 @@ import { FiledTypesDesc, replaceCells, ReplaceInfos, SupportField, createRegexFr
 import DiffCard from "./components/DiffCard";
 import { useTranslation } from 'react-i18next';
 import { icons } from './icons'
-
-
-
-
-
-export enum ModeValue {
-  simple = 'simple',
-  reg = 'reg',
-  json = 'json',
-}
+import { IconHelpCircle } from '@douyinfe/semi-icons';
+import { ModeValue } from './types'
 
 
 /** 监听table,所有table的字段变化，然后重新挂载App组件 */
@@ -32,7 +25,7 @@ export default function Ap() {
   // 绑定过的tableId
   const bindList = useRef<Set<string>>(new Set());
 
-  const refresh = useMemo(
+  const refresh = useMemo( 
     () => () => {
       const t = new Date().getTime();
       setKey(t);
@@ -537,8 +530,14 @@ function App() {
               background: '#EEEEEE'
             }}
             rows={10}
+            
             field="findCellJson"
-            label={t("dict.json.label")}
+            label={{
+              text: t("dict.json.label"),
+              extra: <Tooltip content={<p className="pre">
+                { t('json.desc')}
+              </p>}><IconHelpCircle style={{ color: 'var(--semi-color-text-2)' }}/></Tooltip>
+            }}
             placeholder={t("please.enter")}
           ></Form.TextArea>}
           {(mode === ModeValue.reg || mode === ModeValue.simple) && <Form.TextArea
