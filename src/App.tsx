@@ -530,7 +530,6 @@ function App() {
               background: '#EEEEEE'
             }}
             rows={10}
-            
             field="findCellJson"
             label={{
               text: t("dict.json.label"),
@@ -538,7 +537,7 @@ function App() {
                 { t('json.desc')}
               </p>}><IconHelpCircle style={{ color: 'var(--semi-color-text-2)' }}/></Tooltip>
             }}
-            placeholder={t("please.enter")}
+            placeholder={t("json.text.placeholder")}
           ></Form.TextArea>}
           {(mode === ModeValue.reg || mode === ModeValue.simple) && <Form.TextArea
             field="replaceBy"
