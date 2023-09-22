@@ -1,6 +1,5 @@
 import { IWidgetField, bitable, IOpenCellValue, checkers, IOpenSegment, IOpenSingleCellValue, IOpenSegmentType, FieldType, IWidgetTable, IFieldMeta, IOpenNumber, IOpenPhone, IOpenUrlSegment } from "@lark-base-open/js-sdk";
-import { Toast } from '@douyinfe/semi-ui'
-import { ModeValue } from "./App";
+import { ModeValue } from './types'
 
 
 export interface ReplaceInfo {

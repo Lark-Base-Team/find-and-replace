@@ -28,5 +28,6 @@
 "dict.json.label.2":"Dictionary",
 "mode.select.simple":"Simple Mode",
 "load_error.1":"After running the project, please get the webview address and paste it into the multidimensional table \"Extended Script\" for use. See: ",
-  "load.guide": "Development Guide"
+  "load.guide": "Development Guide",
+  "json.desc":"Use json to perform batch search and replace, such as replacing all lowercase letters a, b, c with uppercase letters: \n{\n \"a\": \"A\",\n \"b\": \"B\",\n \"c\": \"C\"\n}"
 }
