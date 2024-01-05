@@ -5,10 +5,10 @@ import {
   Form,
   Checkbox,
   Spin,
-  Tooltip
+  Tooltip,
 } from "@douyinfe/semi-ui";
 import { FormApi } from "@douyinfe/semi-ui/lib/es/form";
-import { IFieldMeta, FieldType, IWidgetField, IWidgetTable, TableMeta, bitable } from "@lark-base-open/js-sdk";
+import { IFieldMeta, FieldType, IField, ITable, ITableMeta, bitable } from "@lark-base-open/js-sdk";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { FiledTypesDesc, replaceCells, ReplaceInfos, SupportField, createRegexFromString } from './utils'
 import DiffCard from "./components/DiffCard";
@@ -17,15 +17,16 @@ import { icons } from './icons'
 import { IconHelpCircle } from '@douyinfe/semi-icons';
 import { ModeValue } from './types'
 
+const regHelp = 'https://feishu.feishu.cn/docx/MZACdD4cGoP8MfxYoVucdaRYnBd'
 
 /** 监听table,所有table的字段变化，然后重新挂载App组件 */
 export default function Ap() {
   const [key, setKey] = useState<string | number>(0);
-  const [tableList, setTableList] = useState<IWidgetTable[]>([]);
+  const [tableList, setTableList] = useState<ITable[]>([]);
   // 绑定过的tableId
   const bindList = useRef<Set<string>>(new Set());
 
-  const refresh = useMemo( 
+  const refresh = useMemo(
     () => () => {
       const t = new Date().getTime();
       setKey(t);
@@ -79,7 +80,7 @@ const supportFieldType = Object.keys(FiledTypesDesc);
 /** 选择所有 (字段/table/view) */
 const ALL = "all";
 
-type AllFieldMetaLists = { table: IWidgetTable; fieldMetaList: IFieldMeta[]; name: string }[];
+type AllFieldMetaLists = { table: ITable; fieldMetaList: IFieldMeta[]; name: string }[];
 
 function App() {
   const [mode, setMode] = useState<ModeValue>(ModeValue.simple)
@@ -95,13 +96,15 @@ function App() {
   // 所有查找替换的信息
   const [replaceInfos, setReplaceInfos] = useState<ReplaceInfos | undefined>();
   const [replaceAllLoading, setReplaceAllLoading] = useState(false);
-  const [selection, setSelection] = useState<{ table: IWidgetTable; tableId: string }>();
+  const [selection, setSelection] = useState<{ table: ITable; tableId: string }>();
   // 成功设置的单元格fieldId;recordId
   const [successed, setSeccessed] = useState<string[]>([]);
-  const [tableMetaList, setTableMetaList] = useState<TableMeta[]>();
+  const [tableMetaList, setTableMetaList] = useState<ITableMeta[]>();
   // 所选table下的所有fieldMetalist，暂时只能选一个table，所以长度为最多为1
   const [fieldMetaList, setFieldMetaList] = useState<AllFieldMetaLists>();
   const formApi = useRef<FormApi>();
+  const [simpleModeSearchValue, setSimpleModeSearchValue] = useState('');
+
 
   const [, _update] = useState({});
   const update = () => _update({});
@@ -145,9 +148,9 @@ function App() {
     Promise.allSettled(
       tableIdArr.map((tableId: string) => bitable.base.getTableById(tableId))
     ).then((res) => {
-      const allTable: IWidgetTable[] = [];
+      const allTable: ITable[] = [];
       res.forEach(
-        (v: { status: "rejected" | "fulfilled"; value?: IWidgetTable; reason?: any }) => {
+        (v: { status: "rejected" | "fulfilled"; value?: ITable; reason?: any }) => {
           if (v.value) {
             allTable.push(v.value);
           } else {
@@ -173,7 +176,7 @@ function App() {
             (f: {
               status: "rejected" | "fulfilled";
               value?: {
-                table: IWidgetTable;
+                table: ITable;
                 fieldMetaList: IFieldMeta[];
                 name: string;
               };
@@ -259,14 +262,14 @@ function App() {
       }
 
       /** 所选table实例 */
-      let _table: IWidgetTable;
+      let _table: ITable;
       if (choosedTableId && choosedTableId === selection?.tableId) {
         _table = selection?.table!;
       } else {
         _table = await bitable.base.getTableById(choosedTableId);
       }
       /** 所有filed实例 */
-      let fields: IWidgetField[] = [];
+      let fields: IField[] = [];
 
       if (!view || view === ALL) {
         fields = await _table.getFieldList();
@@ -518,11 +521,22 @@ function App() {
             field="findCell"
             label={t("find.text")}
             placeholder={t("please.enter")}
+            onChange={(v) => setSimpleModeSearchValue(v)}
+            extraText={/\s/.test(simpleModeSearchValue) ? t('empty.text.tooltip') : ''}
           ></Form.TextArea>}
           {mode === ModeValue.reg && <Form.TextArea
             field="findCellReg"
-            label={t("reg.label")}
-            placeholder={t("please.enter")}
+            label={{
+              text: <div>
+                {t("reg.label")}
+                <div onClick={()=>{
+                  window.open(regHelp)
+                }} className="regHelpText">
+                  {t('reg.label.help.text')}
+                </div>
+              </div>,
+            }}
+            placeholder="/\n/g"
           ></Form.TextArea>}
           {mode === ModeValue.json && <Form.TextArea
             style={{
@@ -534,8 +548,8 @@ function App() {
             label={{
               text: t("dict.json.label"),
               extra: <Tooltip content={<p className="pre">
-                { t('json.desc')}
-              </p>}><IconHelpCircle style={{ color: 'var(--semi-color-text-2)' }}/></Tooltip>
+                {t('json.desc')}
+              </p>}><IconHelpCircle style={{ color: 'var(--semi-color-text-2)' }} /></Tooltip>
             }}
             placeholder={t("json.text.placeholder")}
           ></Form.TextArea>}

@@ -92,9 +92,8 @@
     flex-basis: 0;
     flex-grow: 10;
     overflow: scroll;
-    white-space: pre-line;
+    white-space: pre;
     padding: 7px 12px;
-    display: flex;
     align-items: center;
     flex-wrap: wrap;
     max-height: 124px;

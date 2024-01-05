@@ -60,7 +60,7 @@ export default function DiffCard(
                   {Array.isArray(oldCellValue)
                     ? oldCellValue.map((v: any, i) => {
                       return (
-                        <div key={list.recordId + i}>
+                        <span key={list.recordId + i}>
                           {/* 在支持查找替换的字段中，文字是text属性，这里需要展示替换前后的内容*/}
                           {v.link ? (
                             <Tooltip
@@ -75,7 +75,7 @@ export default function DiffCard(
                           ) : (
                             v.text
                           )}
-                        </div>
+                        </span>
                       );
                     })
                     : (oldCellValue as any)}
@@ -84,7 +84,7 @@ export default function DiffCard(
                   {Array.isArray(newCellValue)
                     ? newCellValue.map((v: any, i) => {
                       return (
-                        <div key={list.recordId + i}>
+                        <span key={list.recordId + i}>
                           {/* 在支持查找替换的字段中，文字是text属性，这里需要展示替换前后的内容， */}
                           {v.link ? (
                             <Tooltip
@@ -99,7 +99,7 @@ export default function DiffCard(
                           ) : (
                             v.text
                           )}
-                        </div>
+                        </span>
                       );
                     })
                     : (newCellValue as any)}

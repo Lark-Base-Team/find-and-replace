@@ -1,4 +1,4 @@
-import { IWidgetField, bitable, IOpenCellValue, checkers, IOpenSegment, IOpenSingleCellValue, IOpenSegmentType, FieldType, IWidgetTable, IFieldMeta, IOpenNumber, IOpenPhone, IOpenUrlSegment } from "@lark-base-open/js-sdk";
+import { IField, bitable, IOpenCellValue, checkers, IOpenSegment, IOpenSingleCellValue, IOpenSegmentType, FieldType, ITable, IFieldMeta, IOpenNumber, IOpenPhone, IOpenUrlSegment } from "@lark-base-open/js-sdk";
 import { ModeValue } from './types'
 
 
@@ -30,12 +30,12 @@ export interface ReplaceInfos {
   replaceAll: () => Promise<any>;
   toSetList: ToSetList[];
   replaceInfo: ReplaceInfo[];
-  field: IWidgetField;
-  table: IWidgetTable;
+  field: IField;
+  table: ITable;
   fieldMeta: IFieldMeta;
 }
 
-export async function getFieldValueList(field: IWidgetField | undefined) {
+export async function getFieldValueList(field: IField | undefined) {
   if (!field) {
     return null;
   }
@@ -56,8 +56,8 @@ interface ReplaceCellsProps {
   /** 将查找的内容替换成这个 */
   replaceBy: Cell;
   /** 要在这一列中进行查找替换 */
-  field: IWidgetField;
-  table: IWidgetTable;
+  field: IField;
+  table: ITable;
 }
 interface ReplaceKeys {
   key: string;
@@ -90,7 +90,7 @@ export async function replaceCells({
   const replaceInfo: ReplaceInfo[] = [];
   /** 这些单元格需要被覆盖替换掉 */
   const toSetList: ToSetList[] = [];
-  fieldValueList.forEach((currentFieldValue) => {
+  fieldValueList.forEach((currentFieldValue: any) => {
     const { record_id, value } = currentFieldValue;
     if (value !== null && value !== undefined) {
       if (checkers.isNumber(value)) {
@@ -179,12 +179,14 @@ export async function replaceCells({
       }
       //
       if (checkers.isSegments(value)) {
+        // 处理多个{type:'text'}单值连续的情况：将它们合并成一个
+        const mergedValue: IOpenSegment[] = mergeTextValue(value);
         // 多行文本和链接类型的单元格
         // link 和text是多行文本下4中类型的情况可能出现的替换的值
         let cellNeedToReplace = false;
         const replaceKeys: ReplaceKeys[] = [];
         /** 有可能将替换掉旧的cellValue */
-        let newValue = value
+        let newValue = mergedValue
           .map((v) => {
             // 找出当前的值的最终类型描述
             const singleCellDesc = singleCellDescArr.find((desc) => {
@@ -205,12 +207,12 @@ export async function replaceCells({
               if (typeof currentCellKeyValue === "string") {
 
                 if (actions === "replace" || !actions) {
-                  let newCellKeyValue: any = currentCellKeyValue;
+                  let newCellKeyValue: string = currentCellKeyValue;
                   if (findCell.__mode === ModeValue.simple) {
                     newCellKeyValue = currentCellKeyValue.replaceAll(
                       String(findCell[key]),
-                      String(replaceBy[key]) || ""
-                    ) || null;
+                      String(replaceBy[key] ?? "")
+                    );
                   } else if (findCell.__mode === ModeValue.json) {
                     newCellKeyValue = replaceWithJson(currentCellKeyValue, findCell.__findCellValue as any)
                   } else if (findCell.__mode === ModeValue.reg) {
@@ -241,8 +243,7 @@ export async function replaceCells({
             }
             return newSingleValue;
           })
-          .filter((v) => Boolean(v))
-          .filter((v) => v.text !== null);
+
         if (newValue.length === 0) {
           newValue = null as any;
         }
@@ -407,10 +408,15 @@ function replaceWithReg(str: string, reg: string, replaceBy: string) {
   return str.replace(regExp, replaceBy)
 }
 
+/** 从字符串创建正则 */
 export function createRegexFromString(str: string) {
-  const regexParts = str.trim().match(/\/(.*)\/([gimyus]{0,6})/);
+  str = str.trim();
 
-  if (regexParts && regexParts.length >= 3) {
+  const divideReg = /^\/(.*)\/([gimyus]{0,6})$/;
+
+  const regexParts = str.match(divideReg) ?? ('/' + str + '/').match(divideReg);
+
+  if (regexParts) {
     const pattern = regexParts[1];
     const flags = regexParts[2];
 
@@ -420,4 +426,27 @@ export function createRegexFromString(str: string) {
   } else {
     throw new Error('Invalid regular expression string');
   }
+}
+
+/** 合并连续type:'text'的IOpenSegment */
+function mergeTextValue(value: IOpenSegment[]) {
+  const mergedValue: IOpenSegment[] = [];
+
+  value.forEach((v) => {
+    const length = mergedValue.length;
+    const last = mergedValue[length - 1];
+
+    if (!length) {
+      mergedValue.push({ ...v, text: v.text ?? '' });
+      return;
+    }
+
+    if (v.type === 'text' && last.type === 'text') {
+      last.text += v.text ?? '';
+    } else {
+      mergedValue.push({ ...v, text: v.text ?? '' });
+    }
+  });
+
+  return mergedValue;
 }

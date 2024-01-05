@@ -14,7 +14,7 @@
   "dependencies": {
     "@douyinfe/semi-icons": "^2.43.2",
     "@douyinfe/semi-ui": "^2.35.0",
-    "@lark-base-open/js-sdk": "^0.2.1",
+    "@lark-base-open/js-sdk": "^0.3.5",
     "i18next": "^23.2.3",
     "react-i18next": "^13.0.1"
   },
