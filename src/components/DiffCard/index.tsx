@@ -55,7 +55,7 @@ export default function DiffCard(
             const { recordId, value: newCellValue } = list;
             let diff;
             diff = (
-              <div className="diffCell">
+              <div key={list.recordId + toSetListIndex} className="diffCell">
                 <div className="old">
                   {Array.isArray(oldCellValue)
                     ? oldCellValue.map((v: any, i) => {

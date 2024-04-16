@@ -133,6 +133,10 @@ function App() {
       }
     ]
 
+  useEffect(() => {
+    formApi.current?.setValue("field", []);
+  }, [fieldMetaList])
+
 
   const onSelectTable = (tableIdArr: any) => {
     // 先只做单选一个数据表
@@ -498,7 +502,7 @@ function App() {
                       } else {
                         formApi.current!.setValue(
                           "field",
-                          allFieldsInitValue.current
+                          [...allFieldsInitValue.current]
                         );
                       }
                       update();
@@ -529,7 +533,7 @@ function App() {
             label={{
               text: <div>
                 {t("reg.label")}
-                <div onClick={()=>{
+                <div onClick={() => {
                   window.open(regHelp)
                 }} className="regHelpText">
                   {t('reg.label.help.text')}
