@@ -12,8 +12,8 @@ dependencies:
     specifier: ^2.35.0
     version: 2.44.0(react-dom@18.2.0)(react@18.2.0)
   '@lark-base-open/js-sdk':
-    specifier: ^0.3.5
-    version: 0.3.5
+    specifier: ^0.3.8
+    version: 0.3.8
   i18next:
     specifier: ^23.2.3
     version: 23.5.1
@@ -494,8 +494,8 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
 
-  /@lark-base-open/js-sdk@0.3.5:
-    resolution: {integrity: sha512-z7H/+c8r8hfnkny6R+Xd85/58F0bRBf9T2nDc6080axHrH0cTFk3mo+eM3MKyu2xDOEcckmNPoHu25LQPPS9kQ==}
+  /@lark-base-open/js-sdk@0.3.8:
+    resolution: {integrity: sha512-Xsag5kNCIXkq8UxGnlpchwuxay85s/Zd25NvYVoNrqJSHHohuqv4e4X75FzGcc5m+LEv9Pe6gDr32G+U2l01Lg==}
     dev: false
 
   /@types/prop-types@15.7.7:
