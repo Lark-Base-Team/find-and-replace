@@ -284,15 +284,17 @@ export const replaceAll = async (toSetList: ToSetList[], table: ITable, fieldId:
     }).catch((e) => {
       failed.push(...element.map(({ recordId }) => ({ status: 'fulfilled', value: { success: false, fieldIdRecordId: fieldId + ";" + recordId } })))
     });
+
+    setSetRecordsSuccessedStatus({
+      successed: success.length,
+      total: toSetList.length,
+      remain: toSetList.length - success.length - failed.length,
+      fieldMeta,
+      hasMore: false,
+      failed: failed.length,
+    });
   }
-  setSetRecordsSuccessedStatus({
-    successed: success.length,
-    total: toSetList.length,
-    remain: toSetList.length - success.length - failed.length,
-    fieldMeta,
-    hasMore: false,
-    failed: failed.length,
-  });
+
   return { success, failed };
 };
 

@@ -6,8 +6,8 @@
   "set.err": "Failed to set cell",
   "replace": "Replace",
   "replaced": "Replaced",
-  "success": "Successfully set {{success}} cells, failed to set {{err}} cells",
-  "success2": "Successfully set {{success}} cells",
+  "success": "Successfully replaced {{success}} cells, failed to set {{err}} cells",
+  "success2": "Successfully replaced {{success}} cells",
   "select.table": "Select data table",
   "placeholder": "Please select",
   "select.field": "Select field",
@@ -34,5 +34,5 @@
   "reg.label.help.text": "Instructions for use",
   "empty.text.tooltip": "The content you are looking for contains whitespace characters. If this is not entered intentionally, please delete it.",
   "search.status": "{{name}}: {{searched}} / {{total}} has been searched. {{remain}} remains",
-  "set.status": "{{name}}: {{successed}} / {{total}} has been set. {{remain}} remains。failed{{failed}}"
+  "set.status": "{{name}}: Replaced {{successed}} / {{total}}. Remaining {{remain}}. Failed {{failed}}"
 }
