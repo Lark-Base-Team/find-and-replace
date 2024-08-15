@@ -1,5 +1,11 @@
-import { IField, bitable, IOpenCellValue, checkers, IOpenSegment, IOpenSingleCellValue, IOpenSegmentType, FieldType, ITable, IFieldMeta, IOpenNumber, IOpenPhone, IOpenUrlSegment } from "@lark-base-open/js-sdk";
-import { ModeValue } from './types'
+import {
+  IField, bitable, IOpenCellValue, checkers, IOpenSegment, IOpenSingleCellValue, IOpenSegmentType,
+  FieldType, ITable, IFieldMeta, IOpenNumber, IOpenPhone, IOpenUrlSegment
+} from "@lark-base-open/js-sdk";
+import { ISetRecordsStatusAction, ModeValue } from './types';
+import { getStep, setStep } from './constant';
+import { Dispatch } from "react";
+
 
 
 export interface ReplaceInfo {
@@ -35,13 +41,6 @@ export interface ReplaceInfos {
   fieldMeta: IFieldMeta;
 }
 
-export async function getFieldValueList(field: IField | undefined) {
-  if (!field) {
-    return null;
-  }
-  const list = await field.getFieldValueList();
-  return list;
-}
 /** 查找的内容，不一定有text属性,这是根据字段类型的不同而不同 */
 export interface Cell {
   text: string; // 多行文本类型的一定有text属性，
@@ -58,6 +57,8 @@ interface ReplaceCellsProps {
   /** 要在这一列中进行查找替换 */
   field: IField;
   table: ITable;
+  fieldMeta: IFieldMeta;
+  fieldValueList: { recordId: string, value: IOpenCellValue }[]
 }
 interface ReplaceKeys {
   key: string;
@@ -68,30 +69,27 @@ export async function replaceCells({
   findCell,
   replaceBy,
   field,
-  table,
-}: ReplaceCellsProps): Promise<ReplaceInfos | undefined> {
+  fieldValueList
+}: ReplaceCellsProps): Promise<Pick<ReplaceInfos, 'toSetList' | 'replaceInfo'> | undefined> {
   const fieldType: SupportField = (await field.getType()) as any;
   if (!Object.values(SupportField).includes(fieldType)) {
     return;
   }
-  const fieldId = field.id;
   /** 找出支持查找替换的属性的描述 */
   const supportPropertyDesc = FiledTypesDesc[fieldType];
   if (!supportPropertyDesc) {
     return;
   }
-  const fieldValueList = await field.getFieldValueList();
   if (!fieldValueList) {
     return;
   }
-  const fieldMeta = await field.getMeta();
   const singleCellDescArr = Object.values(supportPropertyDesc);
 
   const replaceInfo: ReplaceInfo[] = [];
   /** 这些单元格需要被覆盖替换掉 */
   const toSetList: ToSetList[] = [];
   fieldValueList.forEach((currentFieldValue: any) => {
-    const { record_id, value } = currentFieldValue;
+    const { recordId: record_id, value } = currentFieldValue;
     if (value !== null && value !== undefined) {
       if (checkers.isNumber(value)) {
         //单元格是数字类型
@@ -254,48 +252,49 @@ export async function replaceCells({
       }
     }
   });
-  const replaceAll = async () => {
-    const step = 5000;
-    const success: any = [];
-    const failed: any = []
-    for (let index = 0; index < toSetList.length; index += step) {
-      const element = toSetList.slice(index, index + step);
-      let sleep = element.length
-      await table.setRecords(element.map(({ value, recordId }) => {
-        return {
-          recordId,
-          fields: {
-            [fieldId]: value,
-          }
-        }
-      })).then(() => {
-        success.push(...element.map(({ recordId }) => ({ status: 'fulfilled', value: { success: true, fieldIdRecordId: fieldId + ";" + recordId } })))
-      }).catch((e) => {
-        failed.push(...element.map(({ recordId }) => ({ status: 'fulfilled', value: { success: false, fieldIdRecordId: fieldId + ";" + recordId } })))
-      })
-
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve('')
-        }, sleep);
-      })
-    }
-    return { success, failed };
-
-
-
-
-  };
 
   return {
-    replaceAll,
     toSetList,
     replaceInfo,
-    field,
-    table,
-    fieldMeta,
   };
 }
+/** 替换一个表格中的某个全部字段. */
+export const replaceAll = async (toSetList: ToSetList[], table: ITable, fieldId: string, setSetRecordsSuccessedStatus: Dispatch<ISetRecordsStatusAction>, fieldMeta: IFieldMeta) => {
+  const success: any = [];
+  const failed: any = []
+  const step = getStep();
+  setSetRecordsSuccessedStatus({
+    successed: success.length,
+    total: toSetList.length,
+    remain: toSetList.length - success.length - failed.length,
+    fieldMeta,
+    failed: failed.length
+  });
+  for (let index = 0; index < toSetList.length; index += step) {
+    const element = toSetList.slice(index, index + step);
+    await table.setRecords(element.map(({ value, recordId }) => {
+      return {
+        recordId,
+        fields: {
+          [fieldId]: value,
+        }
+      }
+    })).then(() => {
+      success.push(...element.map(({ recordId }) => ({ status: 'fulfilled', value: { success: true, fieldIdRecordId: fieldId + ";" + recordId } })))
+    }).catch((e) => {
+      failed.push(...element.map(({ recordId }) => ({ status: 'fulfilled', value: { success: false, fieldIdRecordId: fieldId + ";" + recordId } })))
+    });
+  }
+  setSetRecordsSuccessedStatus({
+    successed: success.length,
+    total: toSetList.length,
+    remain: toSetList.length - success.length - failed.length,
+    fieldMeta,
+    hasMore: false,
+    failed: failed.length,
+  });
+  return { success, failed };
+};
 
 //有多个类型的字段，一个字段中又有多个子类型,选中了一个字段之后，还需要再选中这个字段中哪些子类型可以被查找替换,这是这些字段类型，及其单元格可以设置的值类型的表述
 /** 支持查找替换的单元格类型,首先支持多行文本类型的单元格 */

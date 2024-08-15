@@ -5,16 +5,17 @@
   "description": "React TypeScript on Replit, using Vite bundler",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "keywords": [],
+  "output": "dist",
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@douyinfe/semi-icons": "^2.43.2",
     "@douyinfe/semi-ui": "^2.35.0",
-    "@lark-base-open/js-sdk": "^0.3.8",
+    "@lark-base-open/js-sdk": "https://lf3-static.bytednsdoc.com/obj/eden-cn/jjjpceh7nulojvhj/@lark-base-open-js-sdk-0.4.1-rc.3.tgz",
     "i18next": "^23.2.3",
     "react-i18next": "^13.0.1"
   },

@@ -1,13 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
 import { ReplaceInfos } from '../../utils'
-import { Button, Toast, Tooltip } from '@douyinfe/semi-ui'
+import { Button, Pagination, Toast, Tooltip } from '@douyinfe/semi-ui'
 import './styles.css'
 import { icons } from '../../icons'
 import { useTranslation } from 'react-i18next';
-
-
-const pageSize = 100
-
 
 export default function DiffCard(
   props: ReplaceInfos & {
@@ -23,7 +19,10 @@ export default function DiffCard(
   /** 已经设置成功的下标 */
   const settledIndex = useRef<Set<number>>(new Set([-1]));
   const { t } = useTranslation();
-  const [page, setPage] = useState(0)
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+
+  const renderList = toSetList.slice(page * pageSize, (page + 1) * pageSize);
   useEffect(() => {
     if (props.successed.length) {
       toSetList.forEach((list, index) => {
@@ -49,9 +48,9 @@ export default function DiffCard(
           <div className="operation">{t("opt")}</div>
         </div>
         <div>
-          {toSetList.slice(page, (page + 1) * pageSize).map((list, toSetListIndex) => {
-            const info = replaceInfo.filter((r) => r.recordId === list.recordId);
-            const { oldCellValue } = info[0];
+          {renderList.map((list, toSetListIndex) => {
+            const info = replaceInfo.find((r) => r.recordId === list.recordId)!;
+            const { oldCellValue } = info;
             const { recordId, value: newCellValue } = list;
             let diff;
             diff = (
@@ -116,7 +115,7 @@ export default function DiffCard(
               );
             }
             return (
-              <div key={list.recordId + toSetListIndex} className="diffList">
+              <div key={list.recordId} className="diffList">
                 {[
                   diff,
                   <div className="btn">
@@ -149,15 +148,15 @@ export default function DiffCard(
             );
           })}
         </div>
-        {(page + 1) * pageSize < toSetList?.length && toSetList.length > pageSize && <div
-        onClick={()=>setPage(page+1)}
-        className='loadMore'>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17.638 13.35 12 18.988l-5.943-5.943-.84-.835a1 1 0 1 0-1.409 1.418l.667.663 6.818 6.819a1 1 0 0 0 1.414 0l6.473-6.473 1.013-1.011a.999.999 0 0 0-1.41-1.416l-1.146 1.142Z" fill="#2B2F36" />
-            <path d="M17.638 4.443 12 10.08 6.058 4.136l-.84-.835A1 1 0 1 0 3.81 4.72l.667.663 6.818 6.818a1 1 0 0 0 1.414 0l6.473-6.473 1.013-1.011a.999.999 0 0 0-1.41-1.416l-1.146 1.142Z" fill="#2B2F36" />
-          </svg>
 
-        </div>}
+        <Pagination
+          currentPage={page}
+          total={toSetList.length}
+          style={{ marginBottom: 32 }}
+          onChange={(currentPage, pageSize = 10) => {
+            setPage(currentPage);
+            setPageSize(pageSize);
+          }} />
       </div>
     </div>
   );

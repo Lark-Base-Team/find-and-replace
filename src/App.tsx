@@ -9,13 +9,14 @@ import {
 } from "@douyinfe/semi-ui";
 import { FormApi } from "@douyinfe/semi-ui/lib/es/form";
 import { IFieldMeta, FieldType, IField, ITable, ITableMeta, bitable } from "@lark-base-open/js-sdk";
-import { useEffect, useRef, useState, useMemo } from "react";
-import { FiledTypesDesc, replaceCells, ReplaceInfos, SupportField, createRegexFromString } from './utils'
+import { useEffect, useRef, useState, useMemo, useReducer } from "react";
+import { FiledTypesDesc, replaceCells, ReplaceInfos, SupportField, createRegexFromString, ToSetList, replaceAll, ReplaceInfo } from './utils'
 import DiffCard from "./components/DiffCard";
 import { useTranslation } from 'react-i18next';
 import { icons } from './icons'
 import { IconHelpCircle } from '@douyinfe/semi-icons';
-import { ModeValue } from './types'
+import { setStep, getStep } from './constant';
+import { ModeValue, reducer, setRecordsReducer } from './types'
 
 const regHelp = 'https://feishu.feishu.cn/docx/MZACdD4cGoP8MfxYoVucdaRYnBd'
 
@@ -104,6 +105,8 @@ function App() {
   const [fieldMetaList, setFieldMetaList] = useState<AllFieldMetaLists>();
   const formApi = useRef<FormApi>();
   const [simpleModeSearchValue, setSimpleModeSearchValue] = useState('');
+  const [searchStatus, setSearchStatus] = useReducer(reducer, {});
+  const [setRecordsSuccessedStatus, setSetRecordsSuccessedStatus] = useReducer(setRecordsReducer, {});
 
 
   const [, _update] = useState({});
@@ -308,23 +311,68 @@ function App() {
         });
         filteredFields = filteredFields.filter((f) => choosedFieldIds.includes(f.id));
       }
-      return filteredFields.map((f) => {
-        return replaceCells({
-          field: f as any,
-          table: _table as any,
-          findCell: {
-            text: findCell ?? "",
-            link: findCell ?? "",
-            __value: findCell ?? "",
-            __mode: mode,
-            __findCellValue: findCellValue
-          },
-          replaceBy: {
-            text: replaceBy ?? "",
-            link: replaceBy ?? "",
-            __value: replaceBy ?? "",
-          },
-        });
+      return filteredFields.map(async (f) => {
+        const fieldMeta = await f.getMeta();
+        let searched = 0;
+        let toSetList: ToSetList[] = [];
+        let replaceInfo: ReplaceInfo[] = [];
+        let total = undefined;
+        let remain = undefined;
+
+        let hasMore = true;
+        let pageToken: number | undefined = undefined;
+        while (hasMore) {
+          const { hasMore: currentPageHasMore, fieldValues, total: currentPageRemainTotal, pageToken: currentPageToken } = await f.getFieldValueListByPage({ pageToken });
+          pageToken = currentPageToken;
+          hasMore = currentPageHasMore;
+          if (!total) {
+            setStep(fieldValues.length)
+            total = currentPageRemainTotal;
+          }
+
+
+          const { toSetList: currentPageTosetList, replaceInfo: currentPageReplaceInfo } = (await replaceCells({
+            field: f as any,
+            table: _table as any,
+            fieldValueList: fieldValues,
+            findCell: {
+              text: findCell ?? "",
+              link: findCell ?? "",
+              __value: findCell ?? "",
+              __mode: mode,
+              __findCellValue: findCellValue
+            },
+            fieldMeta,
+            replaceBy: {
+              text: replaceBy ?? "",
+              link: replaceBy ?? "",
+              __value: replaceBy ?? "",
+            },
+          })) || {};
+
+          searched += fieldValues.length;
+          remain = total - searched;
+          setSearchStatus({
+            total,
+            remain,
+            hasMore,
+            fieldMeta,
+            searched
+          })
+
+          toSetList = toSetList.concat(currentPageTosetList ?? []);
+          replaceInfo = replaceInfo.concat(currentPageReplaceInfo ?? []);
+        }
+
+        const res: ReplaceInfos = {
+          toSetList,
+          replaceInfo,
+          field: f,
+          table: _table,
+          fieldMeta,
+          replaceAll: () => replaceAll(toSetList, _table, f.id, setSetRecordsSuccessedStatus, fieldMeta)
+        }
+        return res;
       });
     }
   };
@@ -409,9 +457,6 @@ function App() {
     }
   };
 
-  const formValues = formApi.current?.getValues();
-  const { table } = formValues || {};
-
   const onFormChange = () => {
     update();
     const { table, field, findCell, mode, findCellJson, findCellReg } = formApi.current?.getValues();
@@ -450,9 +495,49 @@ function App() {
     return false;
   };
 
+  const RenderSearchLoading = () => {
+    return <div className="loading-tip">
+      {
+        Object.keys(searchStatus).map((fieldId) => {
+          const { total, remain, hasMore, searched, fieldMeta } = searchStatus[fieldId];
+          return hasMore ?
+            <div key={fieldMeta.id} className="loading-tip-search">
+              {t('search.status', { total, remain, hasMore, searched, name: fieldMeta.name })}
+            </div> : null;
+        })
+      }
+    </div>
+  }
+
+  const RenderSetRecordsLoading = () => {
+    return <div className="loading-tip">
+      {
+        Object.keys(setRecordsSuccessedStatus).map((fieldId) => {
+          const { total, remain, hasMore, successed, fieldMeta, failed } = setRecordsSuccessedStatus[fieldId];
+          return <div key={fieldMeta.id} className="loading-tip-search">
+            {t('set.status', { total, remain, hasMore, successed, name: fieldMeta.name, failed })}
+          </div>
+        })
+      }
+    </div>
+  }
+
+  const RenderLoadingTip = () => {
+    if (findBtnLoading) {
+      return <RenderSearchLoading />
+    }
+    if (replaceAllLoading) {
+      return <RenderSetRecordsLoading />
+    }
+    return null;
+  }
+
   return (
-    <div className="container">
-      <Spin spinning={loading}>
+    <Spin spinning={loading || findBtnLoading || replaceAllLoading} tip={
+      <RenderLoadingTip />
+    }>
+      <div className="container">
+
         <Form
           disabled={replaceAllLoading || findBtnLoading}
           onChange={onFormChange}
@@ -490,7 +575,6 @@ function App() {
             </Form.Select>
             {
               <Form.Select
-                key={table?.id || "field"}
                 multiple
                 initValue={allFieldsInitValue.current}
                 outerBottomSlot={
@@ -595,7 +679,6 @@ function App() {
               </div>
             </div>,
             <div key={resultKey}>
-              {" "}
               {replaceInfos.map((i) => (
                 <DiffCard successed={successed} key={i.field.id} {...i}></DiffCard>
               ))}
@@ -606,7 +689,7 @@ function App() {
             <p>{t("result")}</p> <div className="emptyResult">{t("empty")}</div>
           </div>
         ) : null}
-      </Spin>
-    </div>
+      </div>
+    </Spin >
   );
 }

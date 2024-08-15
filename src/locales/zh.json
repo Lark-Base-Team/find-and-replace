@@ -32,5 +32,7 @@
   "json.desc": "使用json进行批量查找替换，如将所有的小写字母a，b，c替换成大写: \n{\n \"a\": \"A\",\n \"b\": \"B\",\n \"c\": \"C\"\n}\n需要注意的是JSON中单斜线\\表示转义字符，如\\n表示换行符，而\\\\n则表示1个斜线加上1个字母n\n",
   "json.text.placeholder": "{\n \"查找的内容\": \"替换的内容\",\n  \"a\": \"A\",\n  \"b\": \"B\"\n}",
   "reg.label.help.text": "使用说明",
-  "empty.text.tooltip":"查找的内容包含空白字符，如果这不是有意输入，请注意将其删除"
+  "empty.text.tooltip": "查找的内容包含空白字符，如果这不是有意输入，请注意将其删除",
+  "search.status": "{{name}}：已搜索{{searched}} / {{total}}。剩余{{remain}}",
+  "set.status": "{{name}}：已设置{{successed}} / {{total}}。剩余{{remain}}。失败{{failed}}"
 }

@@ -1,3 +1,7 @@
+html {
+    --opt-width: 60px;
+}
+
 .fieldTitle {
     font-family: "PingFang SC";
     font-style: normal;
@@ -35,9 +39,9 @@
 }
 .header > .operation {
     max-width: 100px;
-    width: 100px;
+    width: var(--opt-width);
     flex-grow: 0;
-    text-align: end;
+    text-align: center;
 }
 .header div {
     flex-grow: 1;
@@ -75,10 +79,10 @@
     flex-shrink: 0;
     flex-grow: 0;
     display: flex;
-    width: 100px;
+    width: var(--opt-width);
     padding: 6px 12px;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center;
 }
 .diffCell {
     display: flex;
@@ -146,7 +150,7 @@ a {
     height: 50px;
     justify-content: center;
     padding: 10px;
-    cursor:pointer;
+    cursor: pointer;
 }
 
 .loadMore svg {

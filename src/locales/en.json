@@ -32,5 +32,7 @@
   "json.desc": "Use json to perform batch search and replace, such as replacing all lowercase letters a, b, c with uppercase letters: \n{\n \"a\": \"A\",\n \"b\": \"B\",\n \"c\": \"C\"\n}\nIt should be noted that the single slash \\ in JSON represents an escape character, such as \\n represents a newline character, and \\\\n represents a slash plus a letter n\n",
   "json.text.placeholder": "{\n \"Search content\": \"Replace content\",\n \"a\": \"A\",\n \"b\": \"B\"\n}",
   "reg.label.help.text": "Instructions for use",
-  "empty.text.tooltip":"The content you are looking for contains whitespace characters. If this is not entered intentionally, please delete it."
+  "empty.text.tooltip": "The content you are looking for contains whitespace characters. If this is not entered intentionally, please delete it.",
+  "search.status": "{{name}}: {{searched}} / {{total}} has been searched. {{remain}} remains",
+  "set.status": "{{name}}: {{successed}} / {{total}} has been set. {{remain}} remains。failed{{failed}}"
 }
