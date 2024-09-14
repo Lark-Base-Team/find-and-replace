@@ -439,11 +439,21 @@ function App() {
           await Promise.allSettled(v).then((findRes) => {
             const findResArr = findRes.filter(
               //@ts-ignore
-              (r) => r.value && r.value.toSetList.length
+              (r) => {
+                if (r.status === 'rejected') {
+                  throw new Error(r.reason)
+                }
+                return r.value && r.value.toSetList.length
+              }
             );
             if (findRes.length) {
               // @ts-ignore
-              setReplaceInfos(findResArr.map((r_1) => r_1.value));
+              setReplaceInfos(findResArr.map((r_1) => {
+                if (r_1.status === 'rejected') {
+                  throw new Error(r_1.reason)
+                }
+                return r_1.value;
+              }));
               setResultKey(new Date().getTime());
             }
           });

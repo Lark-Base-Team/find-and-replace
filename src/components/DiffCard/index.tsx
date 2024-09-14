@@ -19,10 +19,10 @@ export default function DiffCard(
   /** 已经设置成功的下标 */
   const settledIndex = useRef<Set<number>>(new Set([-1]));
   const { t } = useTranslation();
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const renderList = toSetList.slice(page * pageSize, (page + 1) * pageSize);
+  const renderList = toSetList.slice((page - 1) * pageSize, page * pageSize);
   useEffect(() => {
     if (props.successed.length) {
       toSetList.forEach((list, index) => {
