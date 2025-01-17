@@ -3,12 +3,13 @@ import { initReactI18next } from 'react-i18next';
 
 import translationEN from './locales/en.json';
 import translationZH from './locales/zh.json';
+import translationJA from './locales/ja.json';
 
 // 设置支持的语言列表
-const supportedLanguages = ['en', 'zh'];
+const supportedLanguages = ['en', 'zh', 'ja'];
 
 
-export function initI18n(lang:'en'|'zh'){
+export function initI18n(lang:'en'|'zh'|'ja'){
   // 初始化 i18n
 i18n.use(initReactI18next).init({
   resources: {
@@ -17,6 +18,9 @@ i18n.use(initReactI18next).init({
     },
     zh: {
       translation: translationZH,
+    },
+    ja: {
+      translation: translationJA,
     },
   },
   lng: lang, // 设置默认语言
